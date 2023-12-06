@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignUp</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #f4f4f4;
+        }
+
+        header nav {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            justify-content: space-evenly;
+            display: flex;
+        }
+
+        #imageContainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        img, a {
+            margin: 10px;
+            max-width: 10%;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        img:hover, a:hover {
+            transform: scale(1.05);
+            cursor: pointer;
+        }
+        ul {
+            display: flex;
+            list-style-type: none 
+        }
+        li .navTab {
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <main>
+
+        <header>
+            <nav>
+                <h1>
+                    Uploded Images
+                </h1>
+
+                <ul>
+                    <li><a class="navTab" href="/">uploadFile</a></li>
+                    <li><a class="navTab" href="/">Gallary</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div id="imageContainer"></div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            try {
+                const response = await fetch('/api/getImages');
+                const imageList = await response.json();
+                const imageContainer = document.getElementById("imageContainer");
+
+                imageList.forEach(imageName => {
+                    const fileExtension = imageName.split('.').pop().toLowerCase();
+                    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
+
+                        const imgElement = document.createElement("img");
+                        imgElement.src = `/public/${imageName}`;
+                        imgElement.alt = "Profile Image";
+                        imageContainer.appendChild(imgElement);
+                    }else if (['pdf'].includes(fileExtension)) {
+                        const aElement = document.createElement("a");
+                        aElement.href = `/public/${imageName}`;
+                        aElement.textContent = `View PDF: ${imageName}`;
+                        imageContainer.appendChild(aElement);
+                    } else {
+                        console.warn(`Unsupported file type: ${fileExtension}`);
+                    }
+                });
+            } catch (error) {
+                console.error("Error fetching images:", error);
+            }
+        });
+    </script>
+
+</body>
+</html>
