@@ -36,10 +36,10 @@ app.use(
 
 
 //API Endpoint for uploading file
-app.post("/api/uploadFile", upload.single("myFile"), (req, res) => {
+app.post("/api/uploadFile", upload.array("myFile",3), (req, res) => {
   // Handle the file upload and do any necessary processing
 
-  const redirectUrl = "/profile";
+  const redirectUrl = "/";
 
   res.redirect(redirectUrl)
 });
@@ -53,6 +53,21 @@ app.get('/api/getImages', async (req, res) => {
         console.error("Error reading images:", error);
         res.status(500).send("Internal Server Error");
     }
+});
+
+// Endpoint to handle file deletion
+app.delete('/api/deleteFile/:imageName', async (req, res) => {
+  const imageName = req.params.imageName;
+  const filePath = path.join(__dirname, 'public', 'files', imageName);
+
+  try {
+    // Check if the file exists before attempting to delete
+    await fs.access(filePath);
+    await fs.unlink(filePath);
+    res.status(200).json({ message: 'File deleted successfully.' });
+  } catch (error) {
+    res.status(404).json({ message: 'File not found.' });
+  }
 });
 
 

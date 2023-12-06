@@ -5,49 +5,166 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+            body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    header {
+        background-color: #333;
+        color: white;
+        padding: 15px 20px;
+        text-align: center;
+    }
+
+    nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 24px;
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+    }
+
+    li {
+        margin-right: 15px;
+    }
+
+    .navTab {
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+        font-size: 16px;
+        transition: border-bottom 0.3s ease;
+        border-bottom: 2px solid transparent;
+    }
+
+    .navTab:hover {
+        border-bottom: 2px solid #fff;
+    }
+
+        #form {
+            max-width: 400px;
+            margin: 17rem auto;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .admin__input {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
             box-sizing: border-box;
         }
 
-        header {
-            background-color: #333;
-            color: #fff;
+        .admin__submit {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .admin__submit:hover {
+            background-color: #45a049;
+        }
+        .admin__input {
             padding: 10px;
-            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
         }
-
-        nav {
-            display: flex;
-            justify-content: space-around;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: #fff;
-            font-weight: bold;
-        }
-
-        main {
+        .drop-area {
+            max-width: 400px;
+            /* margin: 20px auto; */
+            border: 2px dashed #ccc;
             padding: 20px;
             text-align: center;
+            cursor: pointer;
+        }
+
+        .drop-area.hover {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
 
     <main>
-        <h1>Dashboard</h1>
-        <form action="/api/uploadFile" enctype="multipart/form-data" method="POST">
-            <input type="file" class="admin__input" id="myFile" name="myFile" />
-            <input class="admin__submit" type="submit" />
-        </form>
+        <header>
+            <nav>
+                <h1>
+                    Uploded Images
+                </h1>
+
+                <ul>
+                    <li><a class="navTab" href="/">uploadFile</a></li>
+                    <li><a class="navTab" href="/profile?filter=img">Gallary</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="drop-area" id="form">
+            <form action="/api/uploadFile" enctype="multipart/form-data" method="POST">
+                <input type="file" class="admin__input" id="myFile" name="myFile" multiple/>
+                <input class="admin__submit" type="submit" value="Upload" />
+            </form>
+        </div>
     </main>
 
+    <script>
+        window.addEventListener('load', () => {
+            const dropArea = document.getElementById('form');
+            const fileInput = document.getElementById('myFile');
+
+            dropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropArea.classList.add('hover');
+            });
+
+            dropArea.addEventListener('dragleave', () => {
+                dropArea.classList.remove('hover');
+            });
+
+            dropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropArea.classList.remove('hover');
+
+                const files = e.dataTransfer.files;
+
+                if (files.length > 0) {
+                    fileInput.files = files;
+                }
+            });
+
+            fileInput.addEventListener('change', () => {
+                // Handle selected files (if needed)
+                console.log(fileInput.files);
+            });
+        });
+    </script>
 </body>
 </html>

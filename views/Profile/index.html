@@ -6,50 +6,92 @@
     <title>SignUp</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            background-color: #f4f4f4;
-        }
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+    }
 
-        header nav {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-            justify-content: space-evenly;
-            display: flex;
-        }
+    header {
+        background-color: #333;
+        color: white;
+        padding: 15px 20px;
+        text-align: center;
+    }
 
-        #imageContainer {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            padding: 20px;
-            text-align: center;
-        }
+    nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-        img, a {
-            margin: 10px;
-            max-width: 10%;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease-in-out;
-        }
+    h1 {
+        margin: 0;
+        font-size: 24px;
+    }
 
-        img:hover, a:hover {
-            transform: scale(1.05);
-            cursor: pointer;
-        }
-        ul {
-            display: flex;
-            list-style-type: none 
-        }
-        li .navTab {
-            text-decoration: none;
-            color: white;
-        }
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+    }
+
+    li {
+        margin-right: 15px;
+    }
+
+    .navTab {
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+        font-size: 16px;
+        transition: border-bottom 0.3s ease;
+        border-bottom: 2px solid transparent;
+    }
+
+    .navTab:hover {
+        border-bottom: 2px solid #fff;
+    }
+
+    #imageContainer {
+        display: flex;
+        justify-content: space-around;
+        padding: 20px;
+    }
+
+    /* #img,
+    #pdf {
+        border: 1px solid #ccc;
+        padding: 20px;
+        box-sizing: border-box;
+        max-width: 400px;
+    } */
+
+    #img img {
+        width: 100%;
+        height: auto;
+    }
+
+    #pdf embed {
+        width: 100%;
+        height: 400px; /* Set the desired height for PDF */
+    }
+    #filter ul {
+        display: flex;
+        justify-content: center;
+    }
+
+    #filter ul li {
+        color: rgb(23, 21, 21);
+        font-size: larger;
+        cursor: pointer;
+        margin: 0 80px;
+    }
+
+    #filter ul li:hover {
+        color: white;
+        background-color: rgb(41, 46, 46);
+    }
     </style>
 </head>
 <body>
@@ -58,16 +100,23 @@
         <header>
             <nav>
                 <h1>
-                    Uploded Images
+                    Images Gallary
                 </h1>
 
                 <ul>
                     <li><a class="navTab" href="/">uploadFile</a></li>
-                    <li><a class="navTab" href="/">Gallary</a></li>
+                    <li><a class="navTab" href="/profile">Gallary</a></li>
                 </ul>
             </nav>
-        </header>
 
+        </header>
+        <div id="filter">
+            <ul>
+                <li style="color: ${window.location.search.split('=')[1] === 'img' ? 'rgb(23, 21, 21)' : ''}" onclick="window.location.href='http://localhost:3000/profile?filter=img'">Img</li>
+                <li onclick="window.location.href='http://localhost:3000/profile?filter=pdf'">File</li>
+                <li onclick="window.location.href='http://localhost:3000/profile?filter=video'">Video</li>
+            </ul>
+        </div>
         <div id="imageContainer"></div>
     </main>
 
@@ -77,24 +126,134 @@
                 const response = await fetch('/api/getImages');
                 const imageList = await response.json();
                 const imageContainer = document.getElementById("imageContainer");
+                const imgDiv = document.createElement("div");
+                const pdfDiv = document.createElement("div");
+                const vDiv = document.createElement("div");
+                vDiv.id = 'video'
+                imgDiv.id = 'img'
+                pdfDiv.id = 'pdf'
+                const type = window.location.search.split('=')[1]
 
-                imageList.forEach(imageName => {
+
+                if(imageList.length){
+                    imageList.forEach(imageName => {
                     const fileExtension = imageName.split('.').pop().toLowerCase();
-                    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
-
+                    if (type == 'img' && ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
                         const imgElement = document.createElement("img");
                         imgElement.src = `/public/${imageName}`;
-                        imgElement.alt = "Profile Image";
-                        imageContainer.appendChild(imgElement);
-                    }else if (['pdf'].includes(fileExtension)) {
+                        imgElement.alt = imageName;
+                        // Create delete button
+                        const deleteButton = document.createElement("button");
+                        deleteButton.textContent = "Delete";
+                        deleteButton.addEventListener('click', () => handleDelete(imageName)); // Assuming handleDelete is a function to handle deletion
+
+                        // Append imgElement and delete button to the container
+                        imgDiv.appendChild(imgElement);
+                        imgDiv.appendChild(deleteButton);
+
+                        // Function to handle image deletion
+                        function handleDelete(imageName) {
+                            // Make a DELETE request to the server to delete the file
+                            fetch(`/api/deleteFile/${imageName}`, {
+                                method: 'DELETE',
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                console.log(`File ${imageName} deleted successfully.`);
+                                // Remove the imgElement and delete button from the container
+                                imgDiv.removeChild(imgElement);
+                                imgDiv.removeChild(deleteButton);
+                                } else {
+                                console.error(`Failed to delete file ${imageName}.`);
+                                }
+                            })
+                            .catch(error => console.error('Error:', error));
+                        }
+                        imgDiv.appendChild(imgElement);
+                    }else if ( type == 'pdf' && ['pdf', 'zip'].includes(fileExtension)) {
                         const aElement = document.createElement("a");
                         aElement.href = `/public/${imageName}`;
                         aElement.textContent = `View PDF: ${imageName}`;
-                        imageContainer.appendChild(aElement);
+
+                        // Create delete button
+                        const deleteButton = document.createElement("button");
+                        deleteButton.textContent = "Delete";
+                        deleteButton.addEventListener('click', () => handleDelete(imageName)); // Assuming handleDelete is a function to handle deletion
+
+                        // Append imgElement and delete button to the container
+                        pdfDiv.appendChild(aElement);
+                        pdfDiv.appendChild(deleteButton);
+
+                        // Function to handle image deletion
+                        function handleDelete(imageName) {
+                            // Make a DELETE request to the server to delete the file
+                            fetch(`/api/deleteFile/${imageName}`, {
+                                method: 'DELETE',
+                            })
+                            .then(response => {
+                                // console.log('response',response);
+                                if (response.ok) {
+                                console.log(`File ${imageName} deleted successfully.`);
+                                // Remove the imgElement and delete button from the container
+                                pdfDiv.removeChild(aElement);
+                                pdfDiv.removeChild(deleteButton);
+                                } else {
+                                console.error(`Failed to delete file ${imageName}.`);
+                                }
+                            })
+                            .catch(error => console.error('Error:', error));
+                        }
+                        pdfDiv.appendChild(aElement);
+                    }else if (type == 'video' &&  ['mp4'].includes(fileExtension)) {
+
+                        // Create video element
+                        const videoElement = document.createElement("video");
+                        videoElement.src = `/public/${imageName}`;
+                        videoElement.controls = true; // Add controls for play/pause, etc.
+                        videoElement.textContent = `View Video: ${imageName}`;
+
+                        // Create delete button
+                        const deleteButton = document.createElement("button");
+                        deleteButton.textContent = "Delete";
+                        deleteButton.addEventListener('click', () => handleDelete(imageName)); // Assuming handleDelete is a function to handle deletion
+
+                        // Append imgElement and delete button to the container
+                        vDiv.appendChild(videoElement);
+                        vDiv.appendChild(deleteButton);
+
+                        // Function to handle image deletion
+                        function handleDelete(imageName) {
+                            // Make a DELETE request to the server to delete the file
+                            fetch(`/api/deleteFile/${imageName}`, {
+                                method: 'DELETE',
+                            })
+                            .then(response => {
+                                // console.log('response',response);
+                                if (response.ok) {
+                                console.log(`File ${imageName} deleted successfully.`);
+                                // Remove the imgElement and delete button from the container
+                                vDiv.removeChild(videoElement);
+                                vDiv.removeChild(deleteButton);
+                                } else {
+                                console.error(`Failed to delete file ${imageName}.`);
+                                }
+                            })
+                            .catch(error => console.error('Error:', error));
+                        }
+                        vDiv.appendChild(videoElement)
                     } else {
                         console.warn(`Unsupported file type: ${fileExtension}`);
                     }
+
+                    imageContainer.appendChild(pdfDiv);
+                    imageContainer.appendChild(imgDiv);
+                    imageContainer.appendChild(vDiv)
                 });
+            }else {
+                const h1Element = document.createElement("h1");
+                h1Element.textContent = "No Image Uploded Yet!!!"; // Replace this with the text you want to append
+                imageContainer.appendChild(h1Element); // Append the h1Element to the body or another container
+            }
             } catch (error) {
                 console.error("Error fetching images:", error);
             }
