@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SignUp</title>
-    <style>
-        body {
-        font-family: 'Arial', sans-serif;
+<style>
+    body {
+        font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
+        box-sizing: border-box;
+        background-color: #f4f4f4;
     }
 
+    /* Header styling */
     header {
         background-color: #333;
         color: white;
@@ -53,29 +56,45 @@
         border-bottom: 2px solid #fff;
     }
 
-    #imageContainer {
+    #mainContainer {
         display: flex;
         justify-content: space-around;
         padding: 20px;
     }
 
-    /* #img,
-    #pdf {
-        border: 1px solid #ccc;
-        padding: 20px;
-        box-sizing: border-box;
-        max-width: 400px;
-    } */
-
-    #img img {
-        width: 100%;
+    /* Img styling */
+    img {
+        max-width: 100%;
         height: auto;
+        margin-top: 10px;
+        border-radius: 5px;
     }
 
+    #img {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        padding: 20px;
+    }
+
+    .imgChild {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin: 10px;
+        padding: 15px;
+        text-align: center;
+        max-width: 100%; /* Adjusted for responsiveness */
+        transition: transform 0.2s ease-in-out;
+    }
+
+    /* PDF styling */
     #pdf embed {
         width: 100%;
         height: 400px; /* Set the desired height for PDF */
     }
+
     #filter ul {
         display: flex;
         justify-content: center;
@@ -85,14 +104,97 @@
         color: rgb(23, 21, 21);
         font-size: larger;
         cursor: pointer;
-        margin: 0 80px;
+        margin: 0 20px; /* Adjusted for responsiveness */
     }
 
     #filter ul li:hover {
         color: white;
         background-color: rgb(41, 46, 46);
     }
-    </style>
+
+    #pdf {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        padding: 20px;
+    }
+
+    .pdfChild {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin: 10px;
+        padding: 15px;
+        text-align: center;
+        max-width: 100%; /* Adjusted for responsiveness */
+        transition: transform 0.2s ease-in-out;
+    }
+
+    /* Button and other elements */
+    button {
+        background-color: #4CAF50;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease-in-out;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+
+    a {
+        text-decoration: none;
+        color: #007BFF;
+        display: block;
+        margin-top: 10px;
+    }
+
+    /* Video Styling */
+    #video {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        padding: 20px;
+    }
+
+    .videoChild {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin: 10px;
+        padding: 15px;
+        text-align: center;
+        max-width: 100%; /* Adjusted for responsiveness */
+        transition: transform 0.2s ease-in-out;
+    }
+
+    video {
+        max-width: 100%;
+        height: auto;
+        margin-top: 10px;
+        border-radius: 5px;
+        outline: none; /* Remove default focus outline for better styling */
+    }
+
+    /* Media queries for responsiveness */
+    @media screen and (max-width: 768px) {
+        .imgChild,
+        .pdfChild,
+        .videoChild {
+            max-width: 100%; /* Adjusted for smaller screens */
+        }
+
+        #filter ul li {
+            margin: 0 10px; /* Adjusted for smaller screens */
+        }
+    }
+</style>
+
 </head>
 <body>
     <main>
@@ -117,7 +219,7 @@
                 <li id="videoListItem" onclick="window.location.href='http://localhost:3000/profile?filter=video'">Video</li>
             </ul>
         </div>
-        <div id="imageContainer"></div>
+        <div id="mainContainer"></div>
     </main>
 
     <script>
@@ -125,7 +227,7 @@
             try {
                 const response = await fetch('/api/getImages');
                 const imageList = await response.json();
-                const imageContainer = document.getElementById("imageContainer");
+                const mainContainer = document.getElementById("mainContainer");
                 const imgDiv = document.createElement("div");
                 const pdfDiv = document.createElement("div");
                 const vDiv = document.createElement("div");
@@ -146,14 +248,14 @@
                         const imgElement = document.createElement("img");
                         imgElement.src = `/public/${imageName}`;
                         imgElement.alt = imageName;
+                        const imgChild = document.createElement("div");
+                        imgChild.className = 'imgChild'
                         // Create delete button
                         const deleteButton = document.createElement("button");
                         deleteButton.textContent = "Delete";
                         deleteButton.addEventListener('click', () => handleDelete(imageName)); // Assuming handleDelete is a function to handle deletion
 
                         // Append imgElement and delete button to the container
-                        imgDiv.appendChild(imgElement);
-                        imgDiv.appendChild(deleteButton);
 
                         // Function to handle image deletion
                         function handleDelete(imageName) {
@@ -165,8 +267,8 @@
                                 if (response.ok) {
                                 console.log(`File ${imageName} deleted successfully.`);
                                 // Remove the imgElement and delete button from the container
-                                imgDiv.removeChild(imgElement);
-                                imgDiv.removeChild(deleteButton);
+                                imgChild.removeChild(imgElement);
+                                imgChild.removeChild(deleteButton);
                                 } else {
                                 console.error(`Failed to delete file ${imageName}.`);
                                 }
@@ -174,9 +276,14 @@
                             .catch(error => console.error('Error:', error));
                         }
                         imgListItem.style.color = 'red';
-                        imgDiv.appendChild(imgElement);
+                        imgChild.appendChild(imgElement);
+                        imgChild.appendChild(deleteButton);
+
+                        imgDiv.appendChild(imgChild);
                     }else if ( type == 'pdf' && ['pdf', 'zip'].includes(fileExtension)) {
                         const aElement = document.createElement("a");
+                        const pdfChild = document.createElement("div");
+                        pdfChild.className = 'pdfChild'
                         aElement.href = `/public/${imageName}`;
                         aElement.textContent = `View PDF: ${imageName}`;
 
@@ -186,8 +293,7 @@
                         deleteButton.addEventListener('click', () => handleDelete(imageName)); // Assuming handleDelete is a function to handle deletion
 
                         // Append imgElement and delete button to the container
-                        pdfDiv.appendChild(aElement);
-                        pdfDiv.appendChild(deleteButton);
+                        pdfChild.appendChild(aElement);
 
                         // Function to handle image deletion
                         function handleDelete(imageName) {
@@ -200,15 +306,18 @@
                                 if (response.ok) {
                                 console.log(`File ${imageName} deleted successfully.`);
                                 // Remove the imgElement and delete button from the container
-                                pdfDiv.removeChild(aElement);
-                                pdfDiv.removeChild(deleteButton);
+                                pdfChild.removeChild(aElement);
+                                pdfChild.removeChild(deleteButton);
                                 } else {
                                 console.error(`Failed to delete file ${imageName}.`);
                                 }
                             })
                             .catch(error => console.error('Error:', error));
                         }
-                        pdfDiv.appendChild(aElement);
+                        pdfChild.appendChild(aElement);
+                        pdfChild.appendChild(deleteButton);
+                        pdfDiv.appendChild(pdfChild);
+
                         fileListItem.style.color = 'red';
                     }else if (type == 'video' &&  ['mp4'].includes(fileExtension)) {
 
@@ -217,6 +326,8 @@
                         videoElement.src = `/public/${imageName}`;
                         videoElement.controls = true; // Add controls for play/pause, etc.
                         videoElement.textContent = `View Video: ${imageName}`;
+                        const videoChild = document.createElement("div");
+                        videoChild.className = 'videoChild'
 
                         // Create delete button
                         const deleteButton = document.createElement("button");
@@ -224,8 +335,6 @@
                         deleteButton.addEventListener('click', () => handleDelete(imageName)); // Assuming handleDelete is a function to handle deletion
 
                         // Append imgElement and delete button to the container
-                        vDiv.appendChild(videoElement);
-                        vDiv.appendChild(deleteButton);
 
                         // Function to handle image deletion
                         function handleDelete(imageName) {
@@ -238,8 +347,8 @@
                                 if (response.ok) {
                                 console.log(`File ${imageName} deleted successfully.`);
                                 // Remove the imgElement and delete button from the container
-                                vDiv.removeChild(videoElement);
-                                vDiv.removeChild(deleteButton);
+                                videoChild.removeChild(videoElement);
+                                videoChild.removeChild(deleteButton);
                                 } else {
                                 console.error(`Failed to delete file ${imageName}.`);
                                 }
@@ -247,19 +356,21 @@
                             .catch(error => console.error('Error:', error));
                         }
                         videoListItem.style.color = 'red';
-                        vDiv.appendChild(videoElement)
+                        videoChild.appendChild(videoElement)
+                        videoChild.appendChild(deleteButton);
+                        vDiv.appendChild(videoChild)
                     } else {
                         console.warn(`Unsupported file type: ${fileExtension}`);
                     }
 
-                    imageContainer.appendChild(pdfDiv);
-                    imageContainer.appendChild(imgDiv);
-                    imageContainer.appendChild(vDiv)
+                    mainContainer.appendChild(pdfDiv);
+                    mainContainer.appendChild(imgDiv);
+                    mainContainer.appendChild(vDiv)
                 });
             }else {
                 const h1Element = document.createElement("h1");
                 h1Element.textContent = "No Image Uploded Yet!!!"; // Replace this with the text you want to append
-                imageContainer.appendChild(h1Element); // Append the h1Element to the body or another container
+                mainContainer.appendChild(h1Element); // Append the h1Element to the body or another container
             }
             } catch (error) {
                 console.error("Error fetching images:", error);
