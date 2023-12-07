@@ -112,9 +112,9 @@
         </header>
         <div id="filter">
             <ul>
-                <li style="color: ${window.location.search.split('=')[1] === 'img' ? 'rgb(23, 21, 21)' : ''}" onclick="window.location.href='http://localhost:3000/profile?filter=img'">Img</li>
-                <li onclick="window.location.href='http://localhost:3000/profile?filter=pdf'">File</li>
-                <li onclick="window.location.href='http://localhost:3000/profile?filter=video'">Video</li>
+                <li id="imgListItem" onclick="window.location.href='http://localhost:3000/profile?filter=img'">Img</li>
+                <li id="fileListItem" onclick="window.location.href='http://localhost:3000/profile?filter=pdf'">File</li>
+                <li id="videoListItem" onclick="window.location.href='http://localhost:3000/profile?filter=video'">Video</li>
             </ul>
         </div>
         <div id="imageContainer"></div>
@@ -133,6 +133,10 @@
                 imgDiv.id = 'img'
                 pdfDiv.id = 'pdf'
                 const type = window.location.search.split('=')[1]
+                const imgListItem = document.getElementById('imgListItem');
+                const fileListItem = document.getElementById('fileListItem');
+                const videoListItem = document.getElementById('videoListItem');
+
 
 
                 if(imageList.length){
@@ -169,6 +173,7 @@
                             })
                             .catch(error => console.error('Error:', error));
                         }
+                        imgListItem.style.color = 'red';
                         imgDiv.appendChild(imgElement);
                     }else if ( type == 'pdf' && ['pdf', 'zip'].includes(fileExtension)) {
                         const aElement = document.createElement("a");
@@ -204,6 +209,7 @@
                             .catch(error => console.error('Error:', error));
                         }
                         pdfDiv.appendChild(aElement);
+                        fileListItem.style.color = 'red';
                     }else if (type == 'video' &&  ['mp4'].includes(fileExtension)) {
 
                         // Create video element
@@ -240,6 +246,7 @@
                             })
                             .catch(error => console.error('Error:', error));
                         }
+                        videoListItem.style.color = 'red';
                         vDiv.appendChild(videoElement)
                     } else {
                         console.warn(`Unsupported file type: ${fileExtension}`);
